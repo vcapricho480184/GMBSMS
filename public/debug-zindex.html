@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Z-Index Debug Tool</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .debug-panel {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .element-info {
+            padding: 10px;
+            margin: 5px 0;
+            background: #f9f9f9;
+            border-left: 3px solid #4F46E5;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        .high-zindex {
+            background: #fee;
+            border-left-color: #f00;
+        }
+        button {
+            background: #4F46E5;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        button:hover {
+            background: #4338CA;
+        }
+        .warning {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="debug-panel">
+        <h1>Z-Index Debug Tool</h1>
+        <p>This tool will help identify which elements might be blocking your modal.</p>
+        <button onclick="scanZIndex()">Scan All Z-Index Values</button>
+        <button onclick="window.location.href='member/payments'">Go to Payments Page</button>
+    </div>
+
+    <div class="debug-panel" id="results" style="display:none;">
+        <h2>Scan Results</h2>
+        <div id="output"></div>
+    </div>
+
+    <script>
+        function scanZIndex() {
+            const results = document.getElementById('results');
+            const output = document.getElementById('output');
+            results.style.display = 'block';
+            output.innerHTML = '<p>Scanning...</p>';
+
+            const allElements = document.querySelectorAll('*');
+            const elementsWithZIndex = [];
+
+            allElements.forEach(el => {
+                const style = window.getComputedStyle(el);
+                const zIndex = style.zIndex;
+                
+                if (zIndex !== 'auto' && zIndex !== '0') {
+                    const rect = el.getBoundingClientRect();
+                    elementsWithZIndex.push({
+                        element: el,
+                        zIndex: parseInt(zIndex),
+                        tag: el.tagName.toLowerCase(),
+                        id: el.id || 'no-id',
+                        classes: el.className || 'no-class',
+                        position: style.position,
+                        visible: rect.width > 0 && rect.height > 0
+                    });
+                }
+            });
+
+            // Sort by z-index descending
+            elementsWithZIndex.sort((a, b) => b.zIndex - a.zIndex);
+
+            let html = `<p>Found ${elementsWithZIndex.length} elements with z-index values:</p>`;
+            
+            if (elementsWithZIndex.length === 0) {
+                html += '<p class="warning">No elements with z-index found on this page.</p>';
+            } else {
+                elementsWithZIndex.forEach(item => {
+                    const isHigh = item.zIndex > 1000;
+                    const className = isHigh ? 'element-info high-zindex' : 'element-info';
+                    html += `
+                        <div class="${className}">
+                            <strong>z-index: ${item.zIndex}</strong> ${isHigh ? '⚠️ HIGH' : ''}<br>
+                            Tag: &lt;${item.tag}&gt;<br>
+                            ID: ${item.id}<br>
+                            Classes: ${item.classes}<br>
+                            Position: ${item.position}<br>
+                            Visible: ${item.visible ? 'Yes' : 'No'}
+                        </div>
+                    `;
+                });
+
+                const highZIndex = elementsWithZIndex.filter(item => item.zIndex > 1000);
+                if (highZIndex.length > 0) {
+                    html += `
+                        <div class="warning">
+                            <strong>⚠️ Warning:</strong> Found ${highZIndex.length} element(s) with z-index > 1000. 
+                            These might block your modal if they're visible.
+                        </div>
+                    `;
+                }
+            }
+
+            output.innerHTML = html;
+        }
+
+        // Auto-scan on load
+        window.addEventListener('load', () => {
+            setTimeout(scanZIndex, 500);
+        });
+    </script>
+</body>
+</html>
