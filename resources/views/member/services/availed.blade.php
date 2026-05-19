@@ -5,7 +5,7 @@
 @section('content')
 <div class="card"><div class="card-body p-0"><div class="table-responsive">
     <table class="table">
-        <thead><tr><th>Service</th><th>Price</th><th>Date</th><th>Status</th><th>Notes</th><th width="120">Actions</th></tr></thead>
+        <thead><tr><th>Service</th><th>Price</th><th>Date</th><th>Status</th><th width="120">Actions</th></tr></thead>
         <tbody>
             @forelse($availed as $a)
             <tr>
@@ -19,12 +19,6 @@
                         <span class="badge badge-active">Approved</span>
                     @else
                         <span class="badge badge-expired">Rejected</span>
-                    @endif
-                </td>
-                <td>
-                    <div class="text-muted" style="font-size:0.85rem;">{{ $a->notes ?? '—' }}</div>
-                    @if($a->admin_notes)
-                        <small class="text-danger"><strong>Admin:</strong> {{ $a->admin_notes }}</small>
                     @endif
                 </td>
                 <td>
@@ -42,7 +36,7 @@
                 </td>
             </tr>
             @empty
-            <tr><td colspan="6" class="empty-state"><i class="bi bi-clipboard-check"></i><p>No availed services</p></td></tr>
+            <tr><td colspan="5" class="empty-state"><i class="bi bi-clipboard-check"></i><p>No availed services</p></td></tr>
             @endforelse
         </tbody>
     </table>

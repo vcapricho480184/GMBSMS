@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\AvailedService;
 use App\Models\BillingTransaction;
+use App\Models\AvailedService;
 use Illuminate\Http\Request;
 
 class ApprovalController extends Controller
@@ -26,7 +26,7 @@ class ApprovalController extends Controller
             $query->whereHas('user', fn($q) => $q->where('name', 'like', '%' . $request->search . '%'));
         }
 
-        $requests = $query->latest()->paginate(20)->withQueryString();
+        $requests = $query->latest()->paginate(20)->appends($request->query());
         $pendingCount = AvailedService::pending()->count();
 
         return view('admin.approvals.index', compact('requests', 'pendingCount'));
@@ -38,32 +38,14 @@ class ApprovalController extends Controller
             return back()->with('error', 'This request has already been processed.');
         }
 
-        $request->validate([
-            'admin_notes' => 'nullable|string|max:500',
-        ]);
-
         $availedService->update([
             'status' => 'approved',
-            'admin_notes' => $request->admin_notes,
+            'admin_notes' => null,
             'approved_by' => auth()->id(),
             'approved_at' => now(),
         ]);
 
-        // Create billing transaction for approved service
-        $service = $availedService->gymService;
-        $invoiceNumber = 'INV-' . date('Ymd') . '-' . str_pad($availedService->id, 4, '0', STR_PAD_LEFT);
-
-        BillingTransaction::create([
-            'user_id' => $availedService->user_id,
-            'availed_service_id' => $availedService->id,
-            'invoice_number' => $invoiceNumber,
-            'amount' => $service->price,
-            'payment_method' => 'cash', // Default method, member can change when paying
-            'payment_status' => 'pending',
-            'type' => 'service',
-            'description' => $service->name,
-            'payment_date' => null,
-        ]);
+        BillingTransaction::createForAvailedService($availedService);
 
         return back()->with('success', 'Service request approved successfully!');
     }
@@ -74,13 +56,9 @@ class ApprovalController extends Controller
             return back()->with('error', 'This request has already been processed.');
         }
 
-        $request->validate([
-            'admin_notes' => 'required|string|max:500',
-        ]);
-
         $availedService->update([
             'status' => 'rejected',
-            'admin_notes' => $request->admin_notes,
+            'admin_notes' => null,
             'approved_by' => auth()->id(),
             'approved_at' => now(),
         ]);

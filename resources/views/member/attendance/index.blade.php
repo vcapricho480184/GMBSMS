@@ -4,15 +4,9 @@
 
 @section('content')
 <div class="card mb-3">
-    <div class="card-body d-flex align-items-center justify-content-between">
-        <div>
-            <h6 class="mb-1"><i class="bi bi-clock me-2"></i>Quick Actions</h6>
-            <p class="text-muted mb-0" style="font-size:0.85rem;">{{ now()->format('l, F d, Y') }}</p>
-        </div>
-        <div class="d-flex gap-2">
-            <form method="POST" action="{{ route('member.attendance.check-in') }}">@csrf<button class="btn btn-success btn-sm"><i class="bi bi-box-arrow-in-right me-1"></i>Check In</button></form>
-            <form method="POST" action="{{ route('member.attendance.check-out') }}">@csrf<button class="btn btn-warning btn-sm"><i class="bi bi-box-arrow-right me-1"></i>Check Out</button></form>
-        </div>
+    <div class="card-body">
+        <h6 class="mb-1"><i class="bi bi-calendar-check me-2"></i>Attendance Records</h6>
+        <p class="text-muted mb-0" style="font-size:0.85rem;">View your attendance history below</p>
     </div>
 </div>
 
@@ -31,7 +25,13 @@
             <tr>
                 <td>{{ $a->date->format('M d, Y (D)') }}</td>
                 <td>{{ \Carbon\Carbon::parse($a->check_in)->format('h:i A') }}</td>
-                <td>{{ $a->check_out ? \Carbon\Carbon::parse($a->check_out)->format('h:i A') : '<span class="badge badge-active">In Gym</span>' }}</td>
+                <td>
+                    @if($a->check_out)
+                        {{ \Carbon\Carbon::parse($a->check_out)->format('h:i A') }}
+                    @else
+                        —
+                    @endif
+                </td>
                 <td>{{ $a->duration ?? '—' }}</td>
             </tr>
             @empty

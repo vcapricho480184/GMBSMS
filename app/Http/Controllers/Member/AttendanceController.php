@@ -23,41 +23,4 @@ class AttendanceController extends Controller
 
         return view('member.attendance.index', compact('attendance'));
     }
-
-    public function checkIn()
-    {
-        $existing = Attendance::where('user_id', auth()->id())
-            ->whereDate('date', Carbon::today())
-            ->whereNull('check_out')
-            ->first();
-
-        if ($existing) {
-            return back()->with('error', 'You are already checked in.');
-        }
-
-        Attendance::create([
-            'user_id' => auth()->id(),
-            'date' => Carbon::today(),
-            'check_in' => Carbon::now()->format('H:i:s'),
-        ]);
-
-        return back()->with('success', 'Checked in successfully!');
-    }
-
-    public function checkOut()
-    {
-        $attendance = Attendance::where('user_id', auth()->id())
-            ->whereDate('date', Carbon::today())
-            ->whereNull('check_out')
-            ->latest()
-            ->first();
-
-        if (!$attendance) {
-            return back()->with('error', 'No active check-in found.');
-        }
-
-        $attendance->update(['check_out' => Carbon::now()->format('H:i:s')]);
-
-        return back()->with('success', 'Checked out successfully!');
-    }
 }

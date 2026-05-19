@@ -33,9 +33,13 @@ class DashboardController extends Controller
             ->where('payment_status', 'pending')
             ->count();
 
+        $pendingBalance = BillingTransaction::where('user_id', $user->id)
+            ->where('payment_status', 'pending')
+            ->sum('amount');
+
         return view('member.dashboard', compact(
             'user', 'membership', 'visitsThisMonth',
-            'recentAttendance', 'recentPayments', 'totalSpent', 'pendingPayments'
+            'recentAttendance', 'recentPayments', 'totalSpent', 'pendingPayments', 'pendingBalance'
         ));
     }
 }

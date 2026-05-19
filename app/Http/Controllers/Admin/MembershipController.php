@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\BillingTransaction;
 use App\Models\Membership;
 use App\Models\MembershipPlan;
 use App\Models\User;
-use App\Models\BillingTransaction;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -24,7 +24,7 @@ class MembershipController extends Controller
             $query->whereHas('user', fn($q) => $q->where('name', 'like', '%' . $request->search . '%'));
         }
 
-        $memberships = $query->latest()->paginate(15)->withQueryString();
+        $memberships = $query->latest()->paginate(15)->appends($request->query());
 
         return view('admin.memberships.index', compact('memberships'));
     }
@@ -42,8 +42,6 @@ class MembershipController extends Controller
             'user_id' => ['required', 'exists:users,id'],
             'membership_plan_id' => ['required', 'exists:membership_plans,id'],
             'start_date' => ['required', 'date'],
-            'payment_method' => ['required', 'in:cash,card,gcash,paymaya,bank_transfer,other'],
-            'payment_status' => ['required', 'in:paid,pending'],
         ]);
 
         $plan = MembershipPlan::findOrFail($request->membership_plan_id);
@@ -62,21 +60,10 @@ class MembershipController extends Controller
             'status' => 'active',
         ]);
 
-        // Create billing transaction
-        BillingTransaction::create([
-            'user_id' => $request->user_id,
-            'membership_id' => $membership->id,
-            'invoice_number' => BillingTransaction::generateInvoiceNumber(),
-            'amount' => $plan->price,
-            'payment_method' => $request->payment_method,
-            'payment_status' => $request->payment_status,
-            'type' => 'membership',
-            'description' => $plan->name . ' Membership Plan',
-            'payment_date' => $startDate,
-        ]);
+        BillingTransaction::createForMembership($membership);
 
         return redirect()->route('admin.memberships.index')
-            ->with('success', 'Membership assigned successfully.');
+            ->with('success', 'Membership assigned successfully. You can bill this member from the Billing module.');
     }
 
     public function destroy(Membership $membership)

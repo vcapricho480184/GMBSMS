@@ -5,13 +5,19 @@ namespace App\Http\Controllers\Member;
 use App\Http\Controllers\Controller;
 use App\Models\GymService;
 use App\Models\AvailedService;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class ServiceController extends Controller
 {
     public function available()
     {
-        $services = GymService::available()->get();
+        $services = GymService::available()
+            ->withCount([
+                'availedServices',
+                'availedServices as approved_availed_count' => fn($query) => $query->approved(),
+            ])
+            ->get();
         return view('member.services.available', compact('services'));
     }
 
@@ -20,14 +26,13 @@ class ServiceController extends Controller
         $request->validate([
             'gym_service_id' => 'required|exists:gym_services,id',
             'availed_date' => 'required|date|after_or_equal:today',
-            'notes' => 'nullable|string|max:500',
         ]);
 
         AvailedService::create([
             'user_id' => auth()->id(),
             'gym_service_id' => $request->gym_service_id,
             'availed_date' => $request->availed_date,
-            'notes' => $request->notes,
+            'notes' => null,
             'status' => 'pending',
         ]);
 
@@ -36,7 +41,13 @@ class ServiceController extends Controller
 
     public function availed()
     {
-        $availed = auth()->user()->availedServices()
+        /** @var User|null $user */
+        $user = auth()->user();
+        if (!$user) {
+            abort(401, 'Unauthorized action.');
+        }
+
+        $availed = $user->availedServices()
             ->with('gymService')
             ->latest()
             ->paginate(15);
@@ -75,13 +86,12 @@ class ServiceController extends Controller
         $request->validate([
             'gym_service_id' => 'required|exists:gym_services,id',
             'availed_date' => 'required|date|after_or_equal:today',
-            'notes' => 'nullable|string|max:500',
         ]);
 
         $availedService->update([
             'gym_service_id' => $request->gym_service_id,
             'availed_date' => $request->availed_date,
-            'notes' => $request->notes,
+            'notes' => null,
         ]);
 
         return redirect()->route('member.services.availed')->with('success', 'Service request updated successfully!');

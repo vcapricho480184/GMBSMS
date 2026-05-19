@@ -69,7 +69,9 @@ class AttendanceController extends Controller
             return back()->with('error', 'No active check-in found for this member.');
         }
 
-        $attendance->update(['check_out' => Carbon::now()->format('H:i:s')]);
+        $attendance->update([
+            'check_out' => Carbon::now()->format('H:i:s'),
+        ]);
 
         return back()->with('success', 'Check-out recorded successfully.');
     }

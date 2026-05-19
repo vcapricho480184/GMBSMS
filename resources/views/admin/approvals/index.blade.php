@@ -47,9 +47,6 @@
                         <td class="fw-medium">{{ $req->user->name ?? 'N/A' }}</td>
                         <td>
                             <div>{{ $req->gymService->name ?? 'N/A' }}</div>
-                            @if($req->notes)
-                                <small class="text-muted"><i class="bi bi-chat-left-text"></i> {{ $req->notes }}</small>
-                            @endif
                         </td>
                         <td>{{ $req->availed_date->format('M d, Y') }}</td>
                         <td class="fw-medium">{{ $req->gymService->formatted_price ?? 'N/A' }}</td>
@@ -69,14 +66,11 @@
                                 <div class="approve-form-{{ $req->id }}" style="display: none;">
                                     <form method="POST" action="{{ route('admin.approvals.approve', $req) }}" class="mb-2">
                                         @csrf
-                                        <div class="mb-2">
-                                            <input type="text" name="admin_notes" class="form-control form-control-sm" placeholder="Admin notes (optional)">
-                                        </div>
                                         <div class="d-flex gap-1">
-                                            <button type="submit" class="btn btn-success btn-sm">
+                                            <button type="submit" class="btn btn-success btn-sm flex-fill text-nowrap">
                                                 <i class="bi bi-check"></i> Confirm Approve
                                             </button>
-                                            <button type="button" class="btn btn-secondary btn-sm cancel-approve-{{ $req->id }}">Cancel</button>
+                                            <button type="button" class="btn btn-secondary btn-sm flex-fill text-nowrap cancel-approve-{{ $req->id }}">Cancel</button>
                                         </div>
                                     </form>
                                 </div>
@@ -85,24 +79,21 @@
                                 <div class="reject-form-{{ $req->id }}" style="display: none;">
                                     <form method="POST" action="{{ route('admin.approvals.reject', $req) }}" class="mb-2">
                                         @csrf
-                                        <div class="mb-2">
-                                            <input type="text" name="admin_notes" class="form-control form-control-sm" placeholder="Rejection reason (required)" required>
-                                        </div>
                                         <div class="d-flex gap-1">
-                                            <button type="submit" class="btn btn-danger btn-sm">
+                                            <button type="submit" class="btn btn-danger btn-sm flex-fill text-nowrap">
                                                 <i class="bi bi-x"></i> Confirm Reject
                                             </button>
-                                            <button type="button" class="btn btn-secondary btn-sm cancel-reject-{{ $req->id }}">Cancel</button>
+                                            <button type="button" class="btn btn-secondary btn-sm flex-fill text-nowrap cancel-reject-{{ $req->id }}">Cancel</button>
                                         </div>
                                     </form>
                                 </div>
 
                                 <!-- Action Buttons (Initially Visible) -->
-                                <div class="action-buttons-{{ $req->id }}">
-                                    <button type="button" class="btn btn-sm btn-success show-approve-{{ $req->id }}" title="Approve">
+                                <div class="action-buttons-{{ $req->id }} d-flex gap-2">
+                                    <button type="button" class="btn btn-sm btn-success flex-fill text-nowrap show-approve-{{ $req->id }}" title="Approve">
                                         <i class="bi bi-check-circle"></i> Approve
                                     </button>
-                                    <button type="button" class="btn btn-sm btn-danger show-reject-{{ $req->id }}" title="Reject">
+                                    <button type="button" class="btn btn-sm btn-danger flex-fill text-nowrap show-reject-{{ $req->id }}" title="Reject">
                                         <i class="bi bi-x-circle"></i> Reject
                                     </button>
                                 </div>
@@ -110,9 +101,6 @@
                                 <div>
                                     <small class="text-muted">By: {{ $req->approvedBy->name ?? 'N/A' }}</small><br>
                                     <small class="text-muted">{{ $req->approved_at->format('M d, Y') }}</small>
-                                    @if($req->admin_notes)
-                                        <br><small class="text-info"><i class="bi bi-chat-left-text"></i> {{ $req->admin_notes }}</small>
-                                    @endif
                                 </div>
                             @endif
                         </td>

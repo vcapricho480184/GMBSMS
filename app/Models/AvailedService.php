@@ -26,9 +26,9 @@ class AvailedService extends Model
         return $this->belongsTo(GymService::class);
     }
 
-    public function billingTransaction()
+    public function billingItems()
     {
-        return $this->hasOne(BillingTransaction::class);
+        return $this->hasMany(BillingTransactionItem::class);
     }
 
     public function approvedBy()

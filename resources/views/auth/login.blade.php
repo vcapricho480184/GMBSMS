@@ -41,7 +41,7 @@
                 </div>
                 <button type="submit" class="btn btn-primary w-100 mb-3">Sign In</button>
                 <p class="text-center mb-0" style="font-size:0.85rem;">
-                    Don't have an account? <a href="{{ route('register') }}" class="text-decoration-none">Register here</a>
+                    Need an account? Please contact an admin.
                 </p>
             </form>
         </div>

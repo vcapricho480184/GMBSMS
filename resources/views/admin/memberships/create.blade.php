@@ -30,24 +30,6 @@
                             <label class="form-label">Start Date *</label>
                             <input type="date" name="start_date" class="form-control" value="{{ old('start_date', date('Y-m-d')) }}" required>
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Payment Method *</label>
-                            <select name="payment_method" class="form-select" required>
-                                <option value="cash">Cash</option>
-                                <option value="card">Credit/Debit Card</option>
-                                <option value="gcash">GCash</option>
-                                <option value="paymaya">PayMaya</option>
-                                <option value="bank_transfer">Bank Transfer</option>
-                                <option value="other">Other</option>
-                            </select>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Payment Status *</label>
-                            <select name="payment_status" class="form-select" required>
-                                <option value="paid">Paid</option>
-                                <option value="pending">Pending</option>
-                            </select>
-                        </div>
                     </div>
                     <div class="mt-4 d-flex gap-2">
                         <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg me-1"></i>Assign Membership</button>

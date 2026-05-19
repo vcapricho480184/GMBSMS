@@ -63,7 +63,13 @@
                 <td class="fw-medium">{{ $a->user->name ?? 'N/A' }}</td>
                 <td>{{ $a->date->format('M d, Y') }}</td>
                 <td>{{ \Carbon\Carbon::parse($a->check_in)->format('h:i A') }}</td>
-                <td>{{ $a->check_out ? \Carbon\Carbon::parse($a->check_out)->format('h:i A') : '<span class="badge badge-active">In Gym</span>' }}</td>
+                <td>
+                    @if($a->check_out)
+                        {{ \Carbon\Carbon::parse($a->check_out)->format('h:i A') }}
+                    @else
+                        —
+                    @endif
+                </td>
                 <td>{{ $a->duration ?? '—' }}</td>
             </tr>
             @empty

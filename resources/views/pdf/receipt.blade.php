@@ -61,19 +61,37 @@
             </tr>
         </thead>
         <tbody>
-            <tr>
-                <td>
-                    {{ $billing->description ?? 'N/A' }}
-                    @if($billing->membership && $billing->membership->membershipPlan)
-                        <br><small style="color:#64748b;">Plan: {{ $billing->membership->membershipPlan->name }} ({{ $billing->membership->membershipPlan->duration_label }})</small>
-                    @endif
-                    @if($billing->availedService && $billing->availedService->gymService)
-                        <br><small style="color:#64748b;">Service: {{ $billing->availedService->gymService->name }}</small>
-                    @endif
-                </td>
-                <td>{{ ucfirst($billing->type) }}</td>
-                <td style="text-align:right;">&#8369;{{ number_format($billing->amount, 2) }}</td>
-            </tr>
+            @if($billing->items->count())
+                @foreach($billing->items as $item)
+                <tr>
+                    <td>
+                        {{ $item->description }}
+                        @if($item->membership && $item->membership->membershipPlan)
+                            <br><small style="color:#64748b;">Plan: {{ $item->membership->membershipPlan->name }} ({{ $item->membership->membershipPlan->duration_label }})</small>
+                        @endif
+                        @if($item->availedService && $item->availedService->gymService)
+                            <br><small style="color:#64748b;">Service: {{ $item->availedService->gymService->name }}</small>
+                        @endif
+                    </td>
+                    <td>{{ ucfirst($item->item_type) }}</td>
+                    <td style="text-align:right;">&#8369;{{ number_format($item->amount, 2) }}</td>
+                </tr>
+                @endforeach
+            @else
+                <tr>
+                    <td>
+                        {{ $billing->description ?? 'N/A' }}
+                        @if($billing->membership && $billing->membership->membershipPlan)
+                            <br><small style="color:#64748b;">Plan: {{ $billing->membership->membershipPlan->name }} ({{ $billing->membership->membershipPlan->duration_label }})</small>
+                        @endif
+                        @if($billing->availedService && $billing->availedService->gymService)
+                            <br><small style="color:#64748b;">Service: {{ $billing->availedService->gymService->name }}</small>
+                        @endif
+                    </td>
+                    <td>{{ ucfirst($billing->type) }}</td>
+                    <td style="text-align:right;">&#8369;{{ number_format($billing->amount, 2) }}</td>
+                </tr>
+            @endif
             <tr class="total-row">
                 <td colspan="2" style="text-align:right;">TOTAL</td>
                 <td style="text-align:right;">&#8369;{{ number_format($billing->amount, 2) }}</td>

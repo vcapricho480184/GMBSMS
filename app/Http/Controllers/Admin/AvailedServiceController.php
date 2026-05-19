@@ -23,7 +23,9 @@ class AvailedServiceController extends Controller
             $query->where('gym_service_id', $request->service);
         }
 
-        $availedServices = $query->latest('approved_at')->paginate(15)->withQueryString();
+        /** @var \Illuminate\Pagination\LengthAwarePaginator $availedServices */
+        $availedServices = $query->latest('approved_at')->paginate(15);
+        $availedServices->withQueryString();
         $services = GymService::all();
 
         return view('admin.availed-services.index', compact('availedServices', 'services'));

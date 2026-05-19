@@ -27,9 +27,14 @@ class Membership extends Model
         return $this->belongsTo(MembershipPlan::class);
     }
 
+    public function billingItems()
+    {
+        return $this->hasMany(BillingTransactionItem::class);
+    }
+
     public function billingTransactions()
     {
-        return $this->hasMany(BillingTransaction::class);
+        return $this->hasMany(BillingTransaction::class, 'membership_id');
     }
 
     public function getDaysRemainingAttribute(): int

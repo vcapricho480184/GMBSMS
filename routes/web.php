@@ -38,8 +38,15 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
 
     // Billing
     Route::get('/billing', [Admin\BillingController::class, 'index'])->name('billing.index');
+    Route::get('/billing/create', [Admin\BillingController::class, 'create'])->name('billing.create');
+    Route::post('/billing', [Admin\BillingController::class, 'store'])->name('billing.store');
     Route::get('/billing/{billing}', [Admin\BillingController::class, 'show'])->name('billing.show');
+    Route::get('/billing/{billing}/edit', [Admin\BillingController::class, 'edit'])->name('billing.edit');
     Route::put('/billing/{billing}', [Admin\BillingController::class, 'update'])->name('billing.update');
+    Route::delete('/billing/{billing}', [Admin\BillingController::class, 'destroy'])->name('billing.destroy');
+    Route::get('/billing/{billing}/invoice', [Admin\BillingController::class, 'invoice'])->name('billing.invoice');
+    Route::get('/billing/{billing}/invoice/download', [Admin\BillingController::class, 'downloadInvoice'])->name('billing.invoice.download');
+    Route::get('/billing/{billing}/invoice/preview', [Admin\BillingController::class, 'previewInvoice'])->name('billing.invoice.preview');
     Route::get('/billing/{billing}/receipt', [Admin\BillingController::class, 'receipt'])->name('billing.receipt');
 
     // Attendance
@@ -81,14 +88,10 @@ Route::prefix('member')->name('member.')->middleware(['auth', 'member'])->group(
 
     // Attendance
     Route::get('/attendance', [Member\AttendanceController::class, 'index'])->name('attendance.index');
-    Route::post('/attendance/check-in', [Member\AttendanceController::class, 'checkIn'])->name('attendance.check-in');
-    Route::post('/attendance/check-out', [Member\AttendanceController::class, 'checkOut'])->name('attendance.check-out');
 
     // Payments
     Route::get('/payments', [Member\PaymentController::class, 'index'])->name('payments.index');
     Route::get('/payments/{payment}', [Member\PaymentController::class, 'show'])->name('payments.show');
-    Route::post('/payments/{payment}/process', [Member\PaymentController::class, 'processPayment'])->name('payments.process');
-    Route::post('/payments/process-multiple', [Member\PaymentController::class, 'processMultiplePayments'])->name('payments.process-multiple');
     Route::get('/payments/{payment}/receipt', [Member\PaymentController::class, 'receipt'])->name('payments.receipt');
 });
 

@@ -35,15 +35,6 @@
                         @enderror
                     </div>
 
-                    <div class="mb-3">
-                        <label class="form-label">Notes (Optional)</label>
-                        <textarea name="notes" class="form-control @error('notes') is-invalid @enderror" rows="4" 
-                                  placeholder="Any special requests or notes...">{{ old('notes', $availedService->notes) }}</textarea>
-                        @error('notes')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
                     <div class="alert alert-info">
                         <i class="bi bi-info-circle me-1"></i>
                         <small>Changes will reset the approval status to pending. Admin will need to review your updated request.</small>
