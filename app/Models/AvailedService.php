@@ -9,11 +9,12 @@ class AvailedService extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['user_id', 'gym_service_id', 'availed_date', 'notes', 'status', 'admin_notes', 'approved_by', 'approved_at'];
+    protected $fillable = ['user_id', 'gym_service_id', 'availed_date', 'notes', 'status', 'admin_notes', 'approved_by', 'approved_at', 'billed'];
 
     protected $casts = [
         'availed_date' => 'date',
         'approved_at' => 'datetime',
+        'billed' => 'boolean',
     ];
 
     public function user()
@@ -24,11 +25,6 @@ class AvailedService extends Model
     public function gymService()
     {
         return $this->belongsTo(GymService::class);
-    }
-
-    public function billingItems()
-    {
-        return $this->hasMany(BillingTransactionItem::class);
     }
 
     public function approvedBy()
@@ -49,5 +45,10 @@ class AvailedService extends Model
     public function scopeRejected($query)
     {
         return $query->where('status', 'rejected');
+    }
+
+    public function scopeUnbilled($query)
+    {
+        return $query->where('billed', false);
     }
 }

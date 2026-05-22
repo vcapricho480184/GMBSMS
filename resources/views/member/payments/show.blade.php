@@ -4,7 +4,7 @@
 
 @section('content')
 @php
-    $typeColors = ['membership' => 'primary', 'service' => 'info', 'mixed' => 'dark', 'other' => 'secondary'];
+    $typeColors = ['membership' => 'primary', 'service' => 'info', 'other' => 'secondary'];
     $typeColor = $typeColors[$payment->type] ?? 'secondary';
 @endphp
 <div class="row justify-content-center"><div class="col-lg-8">
@@ -21,16 +21,6 @@
                     <h6 class="text-muted mb-2">Transaction Info</h6>
                     <p class="mb-1"><strong>Type:</strong> <span class="badge bg-{{ $typeColor }}">{{ ucfirst($payment->type) }}</span></p>
                     <p class="mb-1"><strong>Description:</strong> {{ $payment->description ?? '—' }}</p>
-                    @if($payment->items->count())
-                        <p class="mb-0"><strong>Items:</strong> {{ $payment->items->count() }}</p>
-                    @else
-                        @if($payment->membership)
-                            <p class="mb-0"><strong>Plan:</strong> {{ $payment->membership->membershipPlan->name ?? 'N/A' }}</p>
-                        @endif
-                        @if($payment->availedService)
-                            <p class="mb-0"><strong>Service:</strong> {{ $payment->availedService->gymService->name ?? 'N/A' }}</p>
-                        @endif
-                    @endif
                 </div>
                 <div class="col-md-6">
                     <h6 class="text-muted mb-2">Payment</h6>
@@ -40,41 +30,6 @@
                     <p class="mb-0"><strong>Status:</strong> <span class="badge badge-{{ $payment->payment_status }}">{{ ucfirst($payment->payment_status) }}</span></p>
                 </div>
             </div>
-
-            @if($payment->items->count())
-            <hr class="my-4">
-            <div class="table-responsive">
-                <table class="table table-sm">
-                    <thead>
-                        <tr>
-                            <th>Description</th>
-                            <th>Type</th>
-                            <th class="text-end">Amount</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($payment->items as $item)
-                        @php
-                            $itemColor = $typeColors[$item->item_type] ?? 'secondary';
-                        @endphp
-                        <tr>
-                            <td>
-                                {{ $item->description }}
-                                @if($item->membership && $item->membership->membershipPlan)
-                                    <br><small class="text-muted">Plan: {{ $item->membership->membershipPlan->name }} ({{ $item->membership->membershipPlan->duration_label }})</small>
-                                @endif
-                                @if($item->availedService && $item->availedService->gymService)
-                                    <br><small class="text-muted">Service: {{ $item->availedService->gymService->name }}</small>
-                                @endif
-                            </td>
-                            <td><span class="badge bg-{{ $itemColor }}">{{ ucfirst($item->item_type) }}</span></td>
-                            <td class="text-end">₱{{ number_format($item->amount, 2) }}</td>
-                        </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
-            @endif
 
             @if($payment->payment_status == 'pending')
             <hr class="my-4">

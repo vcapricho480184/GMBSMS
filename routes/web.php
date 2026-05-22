@@ -41,7 +41,6 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::get('/billing/create', [Admin\BillingController::class, 'create'])->name('billing.create');
     Route::post('/billing', [Admin\BillingController::class, 'store'])->name('billing.store');
     Route::get('/billing/{billing}', [Admin\BillingController::class, 'show'])->name('billing.show');
-    Route::get('/billing/{billing}/edit', [Admin\BillingController::class, 'edit'])->name('billing.edit');
     Route::put('/billing/{billing}', [Admin\BillingController::class, 'update'])->name('billing.update');
     Route::delete('/billing/{billing}', [Admin\BillingController::class, 'destroy'])->name('billing.destroy');
     Route::get('/billing/{billing}/invoice', [Admin\BillingController::class, 'invoice'])->name('billing.invoice');

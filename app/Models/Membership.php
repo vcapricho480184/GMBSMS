@@ -10,11 +10,12 @@ class Membership extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['user_id', 'membership_plan_id', 'start_date', 'end_date', 'status'];
+    protected $fillable = ['user_id', 'membership_plan_id', 'start_date', 'end_date', 'status', 'billed'];
 
     protected $casts = [
         'start_date' => 'date',
         'end_date' => 'date',
+        'billed' => 'boolean',
     ];
 
     public function user()
@@ -27,14 +28,9 @@ class Membership extends Model
         return $this->belongsTo(MembershipPlan::class);
     }
 
-    public function billingItems()
+    public function scopeUnbilled($query)
     {
-        return $this->hasMany(BillingTransactionItem::class);
-    }
-
-    public function billingTransactions()
-    {
-        return $this->hasMany(BillingTransaction::class, 'membership_id');
+        return $query->where('billed', false);
     }
 
     public function getDaysRemainingAttribute(): int

@@ -62,7 +62,7 @@
                         <th>Invoice</th>
                         <th>Description</th>
                         <th>Amount</th>
-                        <th>Due Date</th>
+                        <th>Date</th>
                         <th width="80">Action</th>
                     </tr>
                 </thead>

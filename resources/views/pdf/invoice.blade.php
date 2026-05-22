@@ -102,7 +102,6 @@
         .status-pending { background: #fef3c7; color: #92400e; }
         .status-failed { background: #fee2e2; color: #991b1b; }
         .status-refunded { background: #dbeafe; color: #1e40af; }
-        .status-overdue { background: #fee2e2; color: #991b1b; margin-left: 5px; }
         
         table { 
             width: 100%; 
@@ -142,11 +141,6 @@
             color: #1e293b;
             margin-bottom: 4px;
         }
-        .item-detail {
-            color: #64748b;
-            font-size: 10px;
-            line-height: 1.5;
-        }
         .type-badge {
             display: inline-block;
             padding: 3px 8px;
@@ -158,7 +152,6 @@
         .type-membership { background: #dbeafe; color: #1e40af; }
         .type-service { background: #e0e7ff; color: #4338ca; }
         .type-other { background: #f1f5f9; color: #475569; }
-        .type-mixed { background: #e2e8f0; color: #334155; }
         
         .totals-section {
             margin-top: 20px;
@@ -206,9 +199,6 @@
             text-align: right;
             font-weight: 600;
             width: 120px;
-        }
-        table.totals-table tr.discount td {
-            color: #dc2626;
         }
         table.totals-table tr.total {
             border-top: 2px solid #1e293b;
@@ -277,9 +267,6 @@
                     <strong>Invoice #:</strong> {{ $billing->invoice_number }}<br>
                     <strong>Invoice Date:</strong> {{ $billing->created_at->format('F d, Y') }}<br>
                     <strong>Payment Date:</strong> {{ $billing->payment_date->format('F d, Y') }}<br>
-                    @if($billing->due_date)
-                    <strong>Due Date:</strong> {{ $billing->due_date->format('F d, Y') }}<br>
-                    @endif
                 </div>
             </div>
         </div>
@@ -299,9 +286,6 @@
         <div class="bill-to-right">
             <div class="section-title">Payment Status:</div>
             <span class="status-badge status-{{ $billing->payment_status }}">{{ strtoupper($billing->payment_status) }}</span>
-            @if($billing->is_overdue)
-            <span class="status-badge status-overdue">OVERDUE</span>
-            @endif
         </div>
     </div>
 
@@ -315,51 +299,15 @@
             </tr>
         </thead>
         <tbody>
-            @if($billing->items->count())
-                @foreach($billing->items as $item)
-                <tr>
-                    <td class="description">
-                        <div class="item-title">{{ $item->description }}</div>
-                        @if($item->membership && $item->membership->membershipPlan)
-                            <div class="item-detail">
-                                Plan: {{ $item->membership->membershipPlan->name }} ({{ $item->membership->membershipPlan->duration_label }})<br>
-                                Valid: {{ $item->membership->start_date->format('M d, Y') }} - {{ $item->membership->end_date->format('M d, Y') }}
-                            </div>
-                        @endif
-                        @if($item->availedService && $item->availedService->gymService)
-                            <div class="item-detail">
-                                Service: {{ $item->availedService->gymService->name }}
-                            </div>
-                        @endif
-                    </td>
-                    <td class="type">
-                        <span class="type-badge type-{{ $item->item_type }}">{{ ucfirst($item->item_type) }}</span>
-                    </td>
-                    <td class="amount">₱{{ number_format($item->amount, 2) }}</td>
-                </tr>
-                @endforeach
-            @else
-                <tr>
-                    <td class="description">
-                        <div class="item-title">{{ $billing->description ?? 'N/A' }}</div>
-                        @if($billing->membership && $billing->membership->membershipPlan)
-                            <div class="item-detail">
-                                Plan: {{ $billing->membership->membershipPlan->name }} ({{ $billing->membership->membershipPlan->duration_label }})<br>
-                                Valid: {{ $billing->membership->start_date->format('M d, Y') }} - {{ $billing->membership->end_date->format('M d, Y') }}
-                            </div>
-                        @endif
-                        @if($billing->availedService && $billing->availedService->gymService)
-                            <div class="item-detail">
-                                Service: {{ $billing->availedService->gymService->name }}
-                            </div>
-                        @endif
-                    </td>
-                    <td class="type">
-                        <span class="type-badge type-{{ $billing->type }}">{{ ucfirst($billing->type) }}</span>
-                    </td>
-                    <td class="amount">{{ $billing->formatted_subtotal }}</td>
-                </tr>
-            @endif
+            <tr>
+                <td class="description">
+                    <div class="item-title">{{ $billing->description ?? 'N/A' }}</div>
+                </td>
+                <td class="type">
+                    <span class="type-badge type-{{ $billing->type }}">{{ ucfirst($billing->type) }}</span>
+                </td>
+                <td class="amount">{{ $billing->formatted_amount }}</td>
+            </tr>
         </tbody>
     </table>
 
@@ -375,22 +323,6 @@
         </div>
         <div class="totals-right">
             <table class="totals-table">
-                <tr>
-                    <td>Subtotal:</td>
-                    <td>{{ $billing->formatted_subtotal }}</td>
-                </tr>
-                @if($billing->discount_percentage > 0)
-                <tr class="discount">
-                    <td>Discount ({{ $billing->discount_percentage }}%):</td>
-                    <td>-{{ $billing->formatted_discount }}</td>
-                </tr>
-                @endif
-                @if($billing->tax_rate > 0)
-                <tr>
-                    <td>Tax ({{ $billing->tax_rate }}%):</td>
-                    <td>+{{ $billing->formatted_tax }}</td>
-                </tr>
-                @endif
                 <tr class="total">
                     <td>TOTAL AMOUNT:</td>
                     <td>{{ $billing->formatted_amount }}</td>

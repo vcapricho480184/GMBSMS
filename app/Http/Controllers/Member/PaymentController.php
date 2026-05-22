@@ -36,12 +36,6 @@ class PaymentController extends Controller
             abort(403);
         }
 
-        $payment->load([
-            'items.membership.membershipPlan',
-            'items.availedService.gymService',
-            'membership.membershipPlan',
-            'availedService.gymService',
-        ]);
         return view('member.payments.show', compact('payment'));
     }
 
@@ -51,13 +45,7 @@ class PaymentController extends Controller
             abort(403);
         }
 
-        $payment->load([
-            'user',
-            'items.membership.membershipPlan',
-            'items.availedService.gymService',
-            'membership.membershipPlan',
-            'availedService.gymService',
-        ]);
+        $payment->load('user');
         $billing = $payment;
         $pdf = Pdf::loadView('pdf.receipt', compact('billing'));
         return $pdf->download('receipt-' . $payment->invoice_number . '.pdf');

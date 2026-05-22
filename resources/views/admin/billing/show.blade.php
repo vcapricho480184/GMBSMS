@@ -4,7 +4,7 @@
 
 @section('content')
 @php
-    $typeColors = ['membership' => 'primary', 'service' => 'info', 'mixed' => 'dark', 'other' => 'secondary'];
+    $typeColors = ['membership' => 'primary', 'service' => 'info', 'other' => 'secondary'];
     $typeColor = $typeColors[$billing->type] ?? 'secondary';
 @endphp
 <div class="row justify-content-center">
@@ -29,7 +29,7 @@
                         <h6 class="text-muted mb-2">Member</h6>
                         <p class="fw-medium mb-1">{{ $billing->user->name ?? 'N/A' }}</p>
                         <p class="text-muted mb-0">{{ $billing->user->email ?? '' }}</p>
-                        @if($billing->user->phone)
+                        @if($billing->user->phone ?? false)
                         <p class="text-muted mb-0">{{ $billing->user->phone }}</p>
                         @endif
                     </div>
@@ -37,90 +37,17 @@
                         <h6 class="text-muted mb-2">Transaction Info</h6>
                         <p class="mb-1"><strong>Type:</strong> <span class="badge bg-{{ $typeColor }}">{{ ucfirst($billing->type) }}</span></p>
                         <p class="mb-1"><strong>Description:</strong> {{ $billing->description ?? '—' }}</p>
-                        @if($billing->items->count())
-                            <p class="mb-0"><strong>Items:</strong> {{ $billing->items->count() }}</p>
-                        @else
-                            @if($billing->membership)
-                                <p class="mb-0"><strong>Plan:</strong> {{ $billing->membership->membershipPlan->name ?? 'N/A' }}</p>
-                            @endif
-                            @if($billing->availedService)
-                                <p class="mb-0"><strong>Service:</strong> {{ $billing->availedService->gymService->name ?? 'N/A' }}</p>
-                            @endif
-                        @endif
                     </div>
 
-                    @if($billing->items->count())
-                    <div class="col-12">
-                        <h6 class="text-muted mb-2">Invoice Items</h6>
-                        <div class="table-responsive">
-                            <table class="table table-sm">
-                                <thead>
-                                    <tr>
-                                        <th>Description</th>
-                                        <th>Type</th>
-                                        <th class="text-end">Amount</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach($billing->items as $item)
-                                    @php
-                                        $itemColor = $typeColors[$item->item_type] ?? 'secondary';
-                                    @endphp
-                                    <tr>
-                                        <td>
-                                            {{ $item->description }}
-                                            @if($item->membership && $item->membership->membershipPlan)
-                                                <br><small class="text-muted">Plan: {{ $item->membership->membershipPlan->name }} ({{ $item->membership->membershipPlan->duration_label }})</small>
-                                                <br><small class="text-muted">Valid: {{ $item->membership->start_date->format('M d, Y') }} - {{ $item->membership->end_date->format('M d, Y') }}</small>
-                                            @endif
-                                            @if($item->availedService && $item->availedService->gymService)
-                                                <br><small class="text-muted">Service: {{ $item->availedService->gymService->name }}</small>
-                                            @endif
-                                        </td>
-                                        <td><span class="badge bg-{{ $itemColor }}">{{ ucfirst($item->item_type) }}</span></td>
-                                        <td class="text-end">₱{{ number_format($item->amount, 2) }}</td>
-                                    </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    @endif
-
-                    <!-- Amount Breakdown -->
                     <div class="col-md-6">
-                        <h6 class="text-muted mb-2">Amount Details</h6>
-                        <table class="table table-sm table-borderless">
-                            <tr>
-                                <td><strong>Subtotal:</strong></td>
-                                <td class="text-end">{{ $billing->formatted_subtotal }}</td>
-                            </tr>
-                            @if($billing->discount_percentage > 0)
-                            <tr>
-                                <td><strong>Discount ({{ $billing->discount_percentage }}%):</strong></td>
-                                <td class="text-end text-danger">-{{ $billing->formatted_discount }}</td>
-                            </tr>
-                            @endif
-                            @if($billing->tax_rate > 0)
-                            <tr>
-                                <td><strong>Tax ({{ $billing->tax_rate }}%):</strong></td>
-                                <td class="text-end">+{{ $billing->formatted_tax }}</td>
-                            </tr>
-                            @endif
-                            <tr class="border-top">
-                                <td><strong>Total Amount:</strong></td>
-                                <td class="text-end"><span class="fs-5 fw-bold text-primary">{{ $billing->formatted_amount }}</span></td>
-                            </tr>
-                        </table>
+                        <h6 class="text-muted mb-2">Amount</h6>
+                        <span class="fs-4 fw-bold text-primary">{{ $billing->formatted_amount }}</span>
                     </div>
 
                     <div class="col-md-6">
                         <h6 class="text-muted mb-2">Payment Information</h6>
                         <p class="mb-1"><strong>Method:</strong> {{ $billing->payment_method_label }}</p>
                         <p class="mb-1"><strong>Payment Date:</strong> {{ $billing->payment_date->format('M d, Y') }}</p>
-                        @if($billing->due_date)
-                        <p class="mb-1"><strong>Due Date:</strong> {{ $billing->due_date->format('M d, Y') }}</p>
-                        @endif
                         <p class="mb-1"><strong>Created:</strong> {{ $billing->created_at->format('M d, Y h:i A') }}</p>
                     </div>
 
@@ -136,9 +63,6 @@
                     <div class="col-12">
                         <h6 class="text-muted mb-2">Status</h6>
                         <span class="badge badge-{{ $billing->payment_status }} fs-6">{{ ucfirst($billing->payment_status) }}</span>
-                        @if($billing->is_overdue)
-                        <span class="badge bg-danger fs-6 ms-2">OVERDUE</span>
-                        @endif
 
                         <form method="POST" action="{{ route('admin.billing.update', $billing) }}" class="mt-3">
                             @csrf @method('PUT')
